@@ -1,0 +1,7 @@
+{
+    "board": "Adafruit:Adafruit_nRF52_Arduino:feather52832",
+    "configuration": "softdevice=s132v6,debug=l3",
+    "port": "/dev/cu.SLAB_USBtoUART",
+    "programmer": "AVRISP mkII",
+    "sketch": "ble/scan.ino"
+}

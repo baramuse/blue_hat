@@ -3,28 +3,36 @@ Example Sound Level Sketch for the
 Adafruit Microphone Amplifier
 ****************************************/
  
-const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
+const int SAMPLE_WINDOW_MS = 10; // Sample window width in mS (50 mS = 20Hz)
+const int MAX_LEVEL = 700;
 unsigned int sample;
+unsigned int signalMax;
+unsigned int signalMin;
+unsigned long startMillis;
  
 void setup() 
 {
    Serial.begin(9600);
+   initSoundLevelSample();
+  
 }
- 
- 
-void loop() 
-{
-   unsigned long startMillis= millis();  // Start of sample window
-   unsigned int peakToPeak = 0;   // peak-to-peak level
- 
-   unsigned int signalMax = 0;
-   unsigned int signalMin = 1024;
- 
-   // collect data for 50 mS
-   while (millis() - startMillis < sampleWindow)
-   {
-      sample = analogRead(A0);
-      if (sample < 1024)  // toss out spurious readings
+
+void initSoundLevelSample() {
+   startMillis = millis();
+   signalMax = 0;
+   signalMin = MAX_LEVEL;
+}
+
+void checkSoundLevel() {
+ if (millis() - startMillis >= SAMPLE_WINDOW_MS) {
+      unsigned int peakToPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
+      float percent = (peakToPeak) / 700.0;  // convert to volts
+      //Serial.println(percent);
+      initSoundLevelSample();
+   } else {
+      sample = analogRead(A4);
+      Serial.println(sample);
+      if (sample < 700)  // toss out spurious readings
       {
          if (sample > signalMax)
          {
@@ -36,8 +44,9 @@ void loop()
          }
       }
    }
-   peakToPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
-   double percent = (peakToPeak * 100) / 1024;  // convert to volts
+}
  
-   Serial.println(percent);
+void loop()
+{
+  checkSoundLevel();
 }
